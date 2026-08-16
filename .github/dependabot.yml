@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # Pinned GitHub Actions in .github/workflows/*. Every `uses:` is pinned to a commit SHA with
+  # a trailing `# vX.Y.Z` comment; Dependabot rewrites both together, so the human-readable
+  # version stays truthful about the SHA above it.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+
+  # Base image of the self-hosted runner (.github/runner/Dockerfile), digest-pinned. This is the
+  # image every consumer's CI job executes in, so an unwatched base would be the longest-lived
+  # stale dependency in the repo.
+  - package-ecosystem: docker
+    directory: /.github/runner
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
+
+  # Base image of the Paseo workspace (.github/workspace/Dockerfile), digest-pinned. Not the CI
+  # runner image, but it does carry a GitHub token and an OpenRouter key at deploy time, so an
+  # unwatched base is the same class of stale dependency.
+  - package-ecosystem: docker
+    directory: /.github/workspace
+    schedule:
+      interval: weekly
+    commit-message:
+      prefix: ci
