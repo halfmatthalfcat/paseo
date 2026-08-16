@@ -1,0 +1,2 @@
+# Real values for the workspace secret — the committed file is the .example.yaml template
+k8s/paseo-secrets.yaml
