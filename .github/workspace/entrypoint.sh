@@ -7,7 +7,7 @@ set -euo pipefail
 REPO_NAME="$(basename "${WORKSPACE_REPO_URL}" .git)"
 REPO_DIR="/workspace/${REPO_NAME}"
 
-# HOME is redirected onto the pod's PVC (k8s/paseo-pod.yaml), the same way CARGO_HOME and
+# HOME is redirected onto the pod's PVC (k8s/paseo-deployment.yaml), the same way CARGO_HOME and
 # PASEO_HOME are, so that per-provider session state written under $HOME (Claude Code's
 # ~/.claude/projects transcripts, credentials, etc.) survives a container restart instead of
 # living on the container's ephemeral overlay layer and vanishing on every OOM/crash restart.

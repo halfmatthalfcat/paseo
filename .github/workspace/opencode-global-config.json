@@ -1,0 +1,24 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "hevy": {
+      "type": "local",
+      "command": ["hevy-mcp"],
+      "environment": {
+        "HEVY_API_KEY": "{env:HEVY_API_KEY}"
+      }
+    },
+    "monarch": {
+      "type": "local",
+      "command": ["/opt/monarch-mcp-server/bin/monarch-mcp-server"]
+    },
+    "renpho": {
+      "type": "local",
+      "command": ["renpho-mcp-server"],
+      "environment": {
+        "RENPHO_EMAIL": "{env:RENPHO_EMAIL}",
+        "RENPHO_PASSWORD": "{env:RENPHO_PASSWORD}"
+      }
+    }
+  }
+}

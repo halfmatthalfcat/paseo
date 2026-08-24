@@ -1,0 +1,102 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: paseo
+  namespace: paseo
+  labels:
+    app: paseo
+spec:
+  replicas: 1
+  # Recreate, not RollingUpdate: the workspace PVC is ReadWriteOnce, so a second pod
+  # created before the first is terminated cannot mount it and would hang in
+  # ContainerCreating. Recreate terminates the old pod first, matching the previous
+  # delete-then-apply workflow.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: paseo
+  template:
+    metadata:
+      labels:
+        app: paseo
+    spec:
+      restartPolicy: Always
+      automountServiceAccountToken: false
+      imagePullSecrets:
+        - name: ghcr-pull
+      containers:
+        - name: paseo
+          image: ghcr.io/halfmatthalfcat/paseo-workspace:latest
+          ports:
+            - containerPort: 6767
+          envFrom:
+            - secretRef:
+                name: paseo-secrets
+          env:
+            - name: HOME
+              value: /workspace/.home
+            - name: CARGO_HOME
+              value: /workspace/.cargo
+            - name: CARGO_BUILD_JOBS
+              value: "4"
+            - name: PASEO_HOME
+              value: /workspace/.paseo
+            - name: DOCKER_HOST
+              value: tcp://localhost:2375
+            - name: OPENCODE_CONFIG
+              value: /usr/local/etc/opencode/opencode.json
+          volumeMounts:
+            - name: workspace
+              mountPath: /workspace
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+              ephemeral-storage: 1Gi
+            limits:
+              cpu: "4"
+              memory: 16Gi
+              ephemeral-storage: 10Gi
+          readinessProbe:
+            tcpSocket:
+              port: 6767
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 6767
+            initialDelaySeconds: 30
+            periodSeconds: 30
+        # Docker-in-Docker sidecar: gives the paseo container a `docker` daemon to talk to (over
+        # DOCKER_HOST above) without making the paseo container itself privileged. Containers,
+        # images, and volumes this daemon manages live in docker-lib, an emptyDir, so they don't
+        # survive a pod restart -- only /workspace (on the PVC) is meant to be durable.
+        - name: dind
+          image: docker:28-dind
+          securityContext:
+            privileged: true
+          env:
+            # No TLS: this daemon is reachable only over the pod's loopback network, which nothing
+            # outside the pod's shared network namespace can reach.
+            - name: DOCKER_TLS_CERTDIR
+              value: ""
+          volumeMounts:
+            - name: docker-lib
+              mountPath: /var/lib/docker
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+              ephemeral-storage: 1Gi
+            limits:
+              cpu: "4"
+              memory: 8Gi
+              ephemeral-storage: 20Gi
+      volumes:
+        - name: workspace
+          persistentVolumeClaim:
+            claimName: paseo-workspace
+        - name: docker-lib
+          emptyDir:
+            sizeLimit: 20Gi
