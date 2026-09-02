@@ -45,9 +45,11 @@ RUN apt-get update \
  && npm install -g opencode-ai@1.18.15 \
  && npm install -g @getpaseo/cli@0.3.1 \
  && npm install -g hevy-mcp@6.1.5 \
- && git clone -q --depth 1 https://github.com/StartupBros-com/renpho-mcp-server.git /opt/renpho-mcp-server \
+ && mkdir /opt/renpho-mcp-server \
  && cd /opt/renpho-mcp-server \
- && git checkout -q f1182346cf332c96dca1cbe6462382638318d0d9 \
+ && git init -q \
+ && git fetch -q --depth 1 https://github.com/StartupBros-com/renpho-mcp-server.git f1182346cf332c96dca1cbe6462382638318d0d9 \
+ && git checkout -q FETCH_HEAD \
  && npm install --no-audit --no-fund --loglevel=error \
  && npm run build --loglevel=error \
  && npm install -g /opt/renpho-mcp-server --loglevel=error \
