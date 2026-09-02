@@ -27,7 +27,7 @@ ENV IS_SANDBOX=1
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
-      build-essential pkg-config git curl ca-certificates gnupg procps python3 python3-venv \
+      build-essential pkg-config git git-lfs curl ca-certificates gnupg procps python3 python3-venv \
  && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
  && apt-get install -y --no-install-recommends nodejs \
  && curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
@@ -54,6 +54,7 @@ RUN apt-get update \
  && npm run build --loglevel=error \
  && npm install -g /opt/renpho-mcp-server --loglevel=error \
  && cd / \
+ && git lfs install --system \
  && python3 -m venv /opt/monarch-mcp-server \
  && /opt/monarch-mcp-server/bin/pip install --no-cache-dir \
       "monarch-mcp-server @ git+https://github.com/robcerda/monarch-mcp-server.git@ca6c1598c99a0ff1f7b7effbb2c9f518224eab44" \

@@ -55,9 +55,9 @@ spec:
               memory: 256Mi
               ephemeral-storage: 1Gi
             limits:
-              cpu: "4"
+              cpu: "8"
               memory: 16Gi
-              ephemeral-storage: 10Gi
+              ephemeral-storage: 100Gi
           readinessProbe:
             tcpSocket:
               port: 6767
