@@ -43,7 +43,7 @@ RUN apt-get update \
  && apt-get update \
  && apt-get install -y --no-install-recommends gh claude-code docker-ce-cli \
  && npm install -g opencode-ai@1.18.15 \
- && npm install -g @getpaseo/cli@0.3.1 \
+ && npm install -g @getpaseo/cli@0.7.1 \
  && npm install -g hevy-mcp@6.1.5 \
  && mkdir /opt/renpho-mcp-server \
  && cd /opt/renpho-mcp-server \
